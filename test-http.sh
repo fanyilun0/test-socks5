@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/table_output.sh"
 # 创建临时文件存储代理列表
 temp_file=$(mktemp)
 # 创建结果输出文件
-output_file="socks5_proxy_test_results_$(date +%Y%m%d_%H%M%S).txt"
+output_file="http_proxy_test_results_$(date +%Y%m%d_%H%M%S).txt"
 
 # 使用普通数组和文件来替代关联数组以提高兼容性
 ip_list_file=$(mktemp)
@@ -46,11 +46,11 @@ record_ip() {
 }
 
 # 提示用户输入代理列表
-echo "请粘贴SOCKS5代理列表，完成后按Ctrl+D："
+echo "请粘贴HTTP代理列表，完成后按Ctrl+D："
 cat > "$temp_file"
 
 {
-    echo "开始测试SOCKS5代理..."
+    echo "开始测试HTTP代理..."
     echo "测试时间: $(date '+%Y-%m-%d %H:%M:%S')"
     if [ -z "$IPQS_API_KEY" ] || [ "$IPQS_API_KEY" = "YOUR_API_KEY_HERE" ]; then
         echo "注意: 未配置IPQS API密钥，将跳过IP风险评分功能"
@@ -66,7 +66,7 @@ cat > "$temp_file"
     unique_ips=0
 
     # 打印表格头部
-    print_table_header "SOCKS5"
+    print_table_header "HTTP"
 
     while IFS= read -r line; do
         # 跳过空行
@@ -74,14 +74,14 @@ cat > "$temp_file"
         
         ((total_count++))
         
-        # 添加socks5://前缀如果没有
-        if [[ ! $line == socks5://* ]]; then
-            proxy="socks5://$line"
+        # 添加http://前缀如果没有
+        if [[ ! $line == http://* ]]; then
+            proxy="http://$line"
         else
             proxy="$line"
         fi
         
-        echo "测试SOCKS5代理: $proxy" >&2
+        echo "测试HTTP代理: $proxy" >&2
         
         # 使用curl测试代理
         result=$(curl -s -m "$REQUEST_TIMEOUT" -x "$proxy" "https://ipv4.icanhazip.com" 2>/dev/null)
@@ -133,4 +133,4 @@ cat > "$temp_file"
     echo -e "\n测试完成!"
 } | tee "$output_file"
 
-echo "详细结果已保存到: $output_file"
+echo "详细结果已保存到: $output_file" 
